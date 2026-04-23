@@ -111,18 +111,6 @@ function bindTrackedLinks() {
   });
 }
 
-function injectAdminButton() {
-  if (document.querySelector(".admin-launch")) {
-    return;
-  }
-
-  const adminButton = document.createElement("a");
-  adminButton.href = "./admin.html";
-  adminButton.className = "admin-launch";
-  adminButton.textContent = "Admin";
-  document.body.appendChild(adminButton);
-}
-
 function initializeAdminPage() {
   const form = document.querySelector("#admin-form");
   if (!form) {
@@ -214,6 +202,5 @@ function initializeAdminPage() {
   const config = await getSiteConfig();
   applySiteConfig(config);
   bindTrackedLinks();
-  injectAdminButton();
   initializeAdminPage();
 })();
