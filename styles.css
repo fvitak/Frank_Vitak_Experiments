@@ -82,6 +82,15 @@ h3 {
   letter-spacing: 0.12em;
 }
 
+.nameplate {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
 h2 {
   margin: 0;
   font-size: clamp(1.8rem, 2.8vw, 2.7rem);
@@ -190,6 +199,7 @@ h3 {
   grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
   gap: 24px;
   margin-top: 28px;
+  align-items: start;
 }
 
 .overview-copy p {
@@ -202,6 +212,7 @@ h3 {
 
 .unified-resource-list {
   margin-top: 0;
+  align-self: start;
 }
 
 .resource-row {
