@@ -73,11 +73,20 @@ export default async function handler(request) {
       : value;
   }
 
-  await put(CONFIG_PATH, JSON.stringify(nextConfig, null, 2), {
-    access: "public",
-    allowOverwrite: true,
-    contentType: "application/json"
-  });
+  try {
+    await put(CONFIG_PATH, JSON.stringify(nextConfig, null, 2), {
+      access: "public",
+      allowOverwrite: true,
+      contentType: "application/json"
+    });
 
-  return json({ ok: true, config: nextConfig });
+    return json({ ok: true, config: nextConfig });
+  } catch (error) {
+    return json(
+      {
+        error: error?.message || "Unable to save config."
+      },
+      500
+    );
+  }
 }

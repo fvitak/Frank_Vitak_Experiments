@@ -56,6 +56,22 @@ async function getSiteConfig() {
   }
 }
 
+async function readJsonResponse(response) {
+  const text = await response.text();
+
+  if (!text) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    return {
+      error: text
+    };
+  }
+}
+
 function applySiteConfig(config) {
   document.querySelectorAll("[data-config-text]").forEach((element) => {
     const key = element.dataset.configText;
@@ -108,6 +124,77 @@ function bindTrackedLinks() {
     });
 
     link.dataset.trackingBound = "true";
+  });
+}
+
+function initializeContactModal() {
+  const modal = document.querySelector("#contact-modal");
+  const form = document.querySelector("#contact-form");
+  const status = document.querySelector("#contact-status");
+
+  if (!modal || !form || !status) {
+    return;
+  }
+
+  const openModal = () => {
+    modal.hidden = false;
+    document.body.style.overflow = "hidden";
+  };
+
+  const closeModal = () => {
+    modal.hidden = true;
+    document.body.style.overflow = "";
+  };
+
+  document.querySelectorAll("[data-contact-trigger='true']").forEach((trigger) => {
+    trigger.addEventListener("click", (event) => {
+      event.preventDefault();
+      openModal();
+    });
+  });
+
+  modal.querySelectorAll("[data-contact-close='true']").forEach((closer) => {
+    closer.addEventListener("click", closeModal);
+  });
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    status.textContent = "Sending message...";
+    status.dataset.state = "";
+
+    const payload = {
+      name: form.elements.namedItem("name").value.trim(),
+      email: form.elements.namedItem("email").value.trim(),
+      message: form.elements.namedItem("message").value.trim()
+    };
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || "Unable to send message.");
+      }
+
+      form.reset();
+      status.textContent = "Message sent.";
+      status.dataset.state = "success";
+    } catch (error) {
+      status.textContent = error.message || "Unable to send message.";
+      status.dataset.state = "error";
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !modal.hidden) {
+      closeModal();
+    }
   });
 }
 
@@ -164,7 +251,7 @@ function initializeAdminPage() {
           body: uploadData
         });
 
-        const uploadPayload = await uploadResponse.json();
+        const uploadPayload = await readJsonResponse(uploadResponse);
         if (!uploadResponse.ok) {
           throw new Error(uploadPayload.error || `Upload failed for ${fieldName}.`);
         }
@@ -184,12 +271,12 @@ function initializeAdminPage() {
         })
       });
 
-      const savePayload = await saveResponse.json();
+      const savePayload = await readJsonResponse(saveResponse);
       if (!saveResponse.ok) {
         throw new Error(savePayload.error || "Unable to save config.");
       }
 
-      status.textContent = "Changes saved for all visitors.";
+      status.textContent = "Changes saved for all visitors. Refresh the public page to confirm the update.";
       status.dataset.state = "success";
     } catch (error) {
       status.textContent = error.message || "Unable to save changes.";
@@ -203,4 +290,5 @@ function initializeAdminPage() {
   applySiteConfig(config);
   bindTrackedLinks();
   initializeAdminPage();
+  initializeContactModal();
 })();
