@@ -205,6 +205,27 @@ function initializeAdminPage() {
   }
 
   const status = document.querySelector("#admin-status");
+  const saveButton = document.querySelector("#admin-save-button");
+  const passwordModal = document.querySelector("#admin-password-modal");
+  const passwordInput = document.querySelector("#admin-password-input");
+  const passwordStatus = document.querySelector("#admin-password-status");
+  const passwordConfirm = document.querySelector("#admin-password-confirm");
+
+  const openPasswordModal = () => {
+    passwordModal.hidden = false;
+    passwordInput.value = "";
+    passwordStatus.textContent = "";
+    document.body.style.overflow = "hidden";
+    passwordInput.focus();
+  };
+
+  const closePasswordModal = () => {
+    passwordModal.hidden = true;
+    passwordInput.value = "";
+    passwordStatus.textContent = "";
+    document.body.style.overflow = "";
+  };
+
   getSiteConfig().then((config) => {
     Object.entries(DEFAULT_SITE_CONFIG).forEach(([key, value]) => {
       const field = form.elements.namedItem(key);
@@ -214,13 +235,12 @@ function initializeAdminPage() {
     });
   });
 
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const password = window.prompt("Enter admin password to save changes:");
+  const runSave = async () => {
+    const password = passwordInput.value;
 
     if (!password) {
-      status.textContent = "Save cancelled.";
-      status.dataset.state = "error";
+      passwordStatus.textContent = "Password is required.";
+      passwordStatus.dataset.state = "error";
       return;
     }
 
@@ -240,6 +260,8 @@ function initializeAdminPage() {
 
     status.textContent = "Saving changes...";
     status.dataset.state = "";
+    passwordStatus.textContent = "";
+    passwordStatus.dataset.state = "";
 
     try {
       for (const fieldName of uploadFields) {
@@ -286,12 +308,35 @@ function initializeAdminPage() {
         throw new Error(savePayload.error || "Unable to save config.");
       }
 
+      closePasswordModal();
       status.textContent = "Changes saved for all visitors. Refresh the public page to confirm the update.";
       status.dataset.state = "success";
     } catch (error) {
-      status.textContent = error.message || "Unable to save changes.";
+      const message = error.message || "Unable to save changes.";
+      passwordStatus.textContent = message;
+      passwordStatus.dataset.state = "error";
+      status.textContent = message;
       status.dataset.state = "error";
     }
+  };
+
+  saveButton.addEventListener("click", () => {
+    openPasswordModal();
+  });
+
+  passwordConfirm.addEventListener("click", () => {
+    runSave();
+  });
+
+  passwordInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      runSave();
+    }
+  });
+
+  passwordModal.querySelectorAll("[data-admin-password-close='true']").forEach((closer) => {
+    closer.addEventListener("click", closePasswordModal);
   });
 }
 

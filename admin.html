@@ -107,7 +107,7 @@
           </div>
 
           <div class="admin-actions">
-            <button type="submit" class="button">Save Changes</button>
+            <button type="button" class="button" id="admin-save-button">Save Changes</button>
             <a class="ghost-link" href="./index.html">Back To Site</a>
           </div>
 
@@ -117,6 +117,32 @@
     </main>
   </div>
 
-  <script src="./script.js?v=20260423-1"></script>
+  <div class="contact-modal" id="admin-password-modal" hidden>
+    <div class="contact-modal-backdrop" data-admin-password-close="true"></div>
+    <div class="contact-modal-dialog panel">
+      <div class="contact-modal-header">
+        <div>
+          <p class="section-label">Save Changes</p>
+          <h2>Enter admin password</h2>
+        </div>
+        <button type="button" class="ghost-link contact-close" data-admin-password-close="true">Close</button>
+      </div>
+
+      <div class="contact-form">
+        <label class="admin-field">
+          <span>Password</span>
+          <input type="password" id="admin-password-input" autocomplete="current-password">
+        </label>
+
+        <div class="admin-actions">
+          <button type="button" class="button" id="admin-password-confirm">Continue</button>
+        </div>
+
+        <p id="admin-password-status" class="admin-status"></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="./script.js?v=20260423-2"></script>
 </body>
 </html>
