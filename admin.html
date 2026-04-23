@@ -119,14 +119,14 @@
   </div>
 
   <div class="contact-modal" id="admin-password-modal" hidden>
-    <div class="contact-modal-backdrop" data-admin-password-close="true"></div>
+    <div class="contact-modal-backdrop" data-admin-password-close="true" onclick="window.__closeAdminPasswordModal && window.__closeAdminPasswordModal()"></div>
     <div class="contact-modal-dialog panel">
       <div class="contact-modal-header">
         <div>
           <p class="section-label">Save Changes</p>
           <h2>Enter admin password</h2>
         </div>
-        <button type="button" class="ghost-link contact-close" data-admin-password-close="true">Close</button>
+        <button type="button" class="ghost-link contact-close" data-admin-password-close="true" onclick="window.__closeAdminPasswordModal && window.__closeAdminPasswordModal()">Close</button>
       </div>
 
       <div class="contact-form">
@@ -136,7 +136,7 @@
         </label>
 
         <div class="admin-actions">
-          <button type="button" class="button" id="admin-password-confirm">Continue</button>
+          <button type="button" class="button" id="admin-password-confirm" onclick="window.__runAdminSave && window.__runAdminSave()">Continue</button>
         </div>
 
         <p id="admin-password-status" class="admin-status"></p>
@@ -201,14 +201,6 @@
       const passwordStatus = document.querySelector("#admin-password-status");
       const passwordConfirm = document.querySelector("#admin-password-confirm");
 
-      const config = await getSiteConfig();
-      Object.entries(DEFAULT_SITE_CONFIG).forEach(([key, value]) => {
-        const field = form.elements.namedItem(key);
-        if (field) {
-          field.value = config[key] || value;
-        }
-      });
-
       const openPasswordModal = () => {
         passwordModal.hidden = false;
         passwordInput.value = "";
@@ -225,6 +217,8 @@
         passwordStatus.textContent = "";
         document.body.style.overflow = "";
       };
+
+      window.__closeAdminPasswordModal = closePasswordModal;
 
       const runSave = async () => {
         const password = passwordInput.value;
@@ -311,6 +305,8 @@
         }
       };
 
+      window.__runAdminSave = runSave;
+
       saveButton.addEventListener("click", openPasswordModal);
       passwordConfirm.addEventListener("click", runSave);
 
@@ -323,6 +319,14 @@
 
       passwordModal.querySelectorAll("[data-admin-password-close='true']").forEach((closer) => {
         closer.addEventListener("click", closePasswordModal);
+      });
+
+      const config = await getSiteConfig();
+      Object.entries(DEFAULT_SITE_CONFIG).forEach(([key, value]) => {
+        const field = form.elements.namedItem(key);
+        if (field) {
+          field.value = config[key] || value;
+        }
       });
     })();
   </script>
