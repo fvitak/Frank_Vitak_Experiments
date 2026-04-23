@@ -19,7 +19,7 @@
           <div>
             <p class="section-label">Admin</p>
             <h2>Edit links, images, and summary content.</h2>
-            <p class="admin-build">Build `admin-v3`</p>
+            <p class="admin-build">Build `admin-v4`</p>
           </div>
           <p class="section-intro">
             Changes save directly to the live site configuration and uploaded assets used by visitors.
@@ -221,37 +221,35 @@
       window.__closeAdminPasswordModal = closePasswordModal;
 
       const runSave = async () => {
-        const password = passwordInput.value;
-
-        if (!password) {
-          passwordStatus.textContent = "Password is required.";
-          passwordStatus.dataset.state = "error";
-          return;
-        }
-
-        const nextConfig = {};
-        Object.keys(DEFAULT_SITE_CONFIG).forEach((key) => {
-          const field = form.elements.namedItem(key);
-          nextConfig[key] = field && typeof field.value === "string" && field.value.trim()
-            ? field.value.trim()
-            : DEFAULT_SITE_CONFIG[key];
-        });
-
-        const uploadFields = [
-          "resume_pdf",
-          "csm_url",
-          "cspo_url",
-          "escape_image",
-          "dnd_image",
-          "common_core_image"
-        ];
-
-        status.textContent = "Saving changes...";
-        status.dataset.state = "";
-        passwordStatus.textContent = "";
-        passwordStatus.dataset.state = "";
-
         try {
+          const password = passwordInput.value;
+
+          status.textContent = "Saving changes...";
+          status.dataset.state = "";
+          passwordStatus.textContent = "Processing save...";
+          passwordStatus.dataset.state = "";
+
+          if (!password) {
+            throw new Error("Password is required.");
+          }
+
+          const nextConfig = {};
+          Object.keys(DEFAULT_SITE_CONFIG).forEach((key) => {
+            const field = form.elements.namedItem(key);
+            nextConfig[key] = field && typeof field.value === "string" && field.value.trim()
+              ? field.value.trim()
+              : DEFAULT_SITE_CONFIG[key];
+          });
+
+          const uploadFields = [
+            "resume_pdf",
+            "csm_url",
+            "cspo_url",
+            "escape_image",
+            "dnd_image",
+            "common_core_image"
+          ];
+
           for (const fieldName of uploadFields) {
             const fileField = form.elements.namedItem(`${fieldName}_file`);
             const file = fileField && fileField.files ? fileField.files[0] : null;
