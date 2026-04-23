@@ -359,6 +359,10 @@ h3 {
   background: rgba(255, 255, 255, 0.56);
 }
 
+.resume-frame-wrap-tall {
+  min-height: 1900px;
+}
+
 .admin-form {
   display: grid;
   gap: 20px;
@@ -467,7 +471,7 @@ h3 {
 .resume-frame {
   display: block;
   width: 100%;
-  min-height: 980px;
+  min-height: 1900px;
   border: 0;
 }
 
