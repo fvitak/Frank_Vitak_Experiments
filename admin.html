@@ -143,6 +143,185 @@
     </div>
   </div>
 
-  <script src="./script.js?v=20260423-2"></script>
+  <script>
+    const DEFAULT_SITE_CONFIG = {
+      summary_copy: "Certified Scrum Product Owner (CSPO) and Certified ScrumMaster (CSM) with four years of hands-on experience owning backlogs, writing user stories and acceptance criteria, and keeping cross-functional teams aligned in JIRA. I've worked across consumer-facing marketplaces and enterprise SaaS platforms, and I'm most effective at the translation layer: turning complex business requirements and stakeholder needs into clear, buildable specs. Data-driven by habit, documentation-disciplined by practice. The projects below are what I build when I'm not at work.",
+      resume_page: "./resume.html",
+      resume_pdf: "./documents/frank-vitak-resume.pdf",
+      resume_back_home: "./index.html",
+      linkedin_url: "https://www.linkedin.com/in/frankvitak",
+      email_url: "mailto:fvitak@gmail.com",
+      csm_url: "./documents/frank-vitak-csm-certificate.pdf",
+      cspo_url: "./documents/frank-vitak-cspo-certificate.pdf",
+      escape_url: "https://escape-the-cubes.vercel.app/",
+      escape_image: "./images/escape-the-cube.png",
+      dnd_url: "https://spring-ridge-dnd.vercel.app/",
+      dnd_image: "./images/dnd-simulator.png",
+      common_core_url: "https://common-core-for-old-people.vercel.app/",
+      common_core_image: "./images/common-core-old-brains.png"
+    };
+
+    async function getSiteConfig() {
+      try {
+        const response = await fetch("/api/config", { cache: "no-store" });
+        if (!response.ok) {
+          return DEFAULT_SITE_CONFIG;
+        }
+
+        const payload = await response.json();
+        return {
+          ...DEFAULT_SITE_CONFIG,
+          ...(payload.config || {})
+        };
+      } catch (error) {
+        return DEFAULT_SITE_CONFIG;
+      }
+    }
+
+    async function readJsonResponse(response) {
+      const text = await response.text();
+      if (!text) {
+        return {};
+      }
+
+      try {
+        return JSON.parse(text);
+      } catch (error) {
+        return { error: text };
+      }
+    }
+
+    (async function initializeAdmin() {
+      const form = document.querySelector("#admin-form");
+      const status = document.querySelector("#admin-status");
+      const saveButton = document.querySelector("#admin-save-button");
+      const passwordModal = document.querySelector("#admin-password-modal");
+      const passwordInput = document.querySelector("#admin-password-input");
+      const passwordStatus = document.querySelector("#admin-password-status");
+      const passwordConfirm = document.querySelector("#admin-password-confirm");
+
+      const config = await getSiteConfig();
+      Object.entries(DEFAULT_SITE_CONFIG).forEach(([key, value]) => {
+        const field = form.elements.namedItem(key);
+        if (field) {
+          field.value = config[key] || value;
+        }
+      });
+
+      const openPasswordModal = () => {
+        passwordModal.hidden = false;
+        passwordInput.value = "";
+        passwordStatus.textContent = "";
+        document.body.style.overflow = "hidden";
+        passwordInput.focus();
+      };
+
+      const closePasswordModal = () => {
+        passwordModal.hidden = true;
+        passwordInput.value = "";
+        passwordStatus.textContent = "";
+        document.body.style.overflow = "";
+      };
+
+      const runSave = async () => {
+        const password = passwordInput.value;
+
+        if (!password) {
+          passwordStatus.textContent = "Password is required.";
+          passwordStatus.dataset.state = "error";
+          return;
+        }
+
+        const nextConfig = {};
+        Object.keys(DEFAULT_SITE_CONFIG).forEach((key) => {
+          nextConfig[key] = form.elements.namedItem(key).value.trim() || DEFAULT_SITE_CONFIG[key];
+        });
+
+        const uploadFields = [
+          "resume_pdf",
+          "csm_url",
+          "cspo_url",
+          "escape_image",
+          "dnd_image",
+          "common_core_image"
+        ];
+
+        status.textContent = "Saving changes...";
+        status.dataset.state = "";
+        passwordStatus.textContent = "";
+        passwordStatus.dataset.state = "";
+
+        try {
+          for (const fieldName of uploadFields) {
+            const fileField = form.elements.namedItem(`${fieldName}_file`);
+            const file = fileField && fileField.files ? fileField.files[0] : null;
+
+            if (!file) {
+              continue;
+            }
+
+            const uploadData = new FormData();
+            uploadData.append("password", password);
+            uploadData.append("field", fieldName);
+            uploadData.append("file", file);
+
+            const uploadResponse = await fetch("/api/upload", {
+              method: "POST",
+              body: uploadData
+            });
+
+            const uploadPayload = await readJsonResponse(uploadResponse);
+            if (!uploadResponse.ok) {
+              throw new Error(uploadPayload.error || `Upload failed for ${fieldName}.`);
+            }
+
+            nextConfig[fieldName] = uploadPayload.url;
+            form.elements.namedItem(fieldName).value = uploadPayload.url;
+            fileField.value = "";
+          }
+
+          const saveResponse = await fetch("/api/config", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              password,
+              config: nextConfig
+            })
+          });
+
+          const savePayload = await readJsonResponse(saveResponse);
+          if (!saveResponse.ok) {
+            throw new Error(savePayload.error || "Unable to save config.");
+          }
+
+          closePasswordModal();
+          status.textContent = "Changes saved for all visitors. Refresh the public page to confirm the update.";
+          status.dataset.state = "success";
+        } catch (error) {
+          const message = error.message || "Unable to save changes.";
+          passwordStatus.textContent = message;
+          passwordStatus.dataset.state = "error";
+          status.textContent = message;
+          status.dataset.state = "error";
+        }
+      };
+
+      saveButton.addEventListener("click", openPasswordModal);
+      passwordConfirm.addEventListener("click", runSave);
+
+      passwordInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          runSave();
+        }
+      });
+
+      passwordModal.querySelectorAll("[data-admin-password-close='true']").forEach((closer) => {
+        closer.addEventListener("click", closePasswordModal);
+      });
+    })();
+  </script>
 </body>
 </html>
