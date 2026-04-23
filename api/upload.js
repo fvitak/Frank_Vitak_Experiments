@@ -1,82 +1,70 @@
-import { put } from "@vercel/blob";
-
-const ALLOWED_FIELDS = new Set([
-  "resume_pdf",
-  "csm_url",
-  "cspo_url",
-  "escape_image",
-  "dnd_image",
-  "common_core_image"
-]);
-
-function json(data, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      "Content-Type": "application/json",
-      "Cache-Control": "no-store"
-    }
-  });
-}
-
-function extensionFor(fileName) {
-  const parts = fileName.split(".");
-  return parts.length > 1 ? parts.pop().toLowerCase() : "bin";
-}
+import { handleUpload } from "@vercel/blob/client";
 
 export default async function handler(request) {
   if (request.method !== "POST") {
-    return json({ error: "Method not allowed." }, 405);
+    return new Response(JSON.stringify({ error: "Method not allowed." }), {
+      status: 405,
+      headers: { "Content-Type": "application/json" }
+    });
   }
 
   const adminPassword = process.env.ADMIN_PASSWORD;
   if (!adminPassword) {
-    return json({ error: "ADMIN_PASSWORD is not configured." }, 500);
+    return new Response(JSON.stringify({ error: "ADMIN_PASSWORD is not configured." }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" }
+    });
   }
 
-  let body;
-  try {
-    body = await request.json();
-  } catch (error) {
-    return json({ error: "Invalid JSON body." }, 400);
-  }
-
-  const password = body.password;
-  const field = body.field;
-  const fileName = body.fileName;
-  const contentType = body.contentType;
-  const base64 = body.base64;
-
-  if (password !== adminPassword) {
-    return json({ error: "Incorrect password." }, 401);
-  }
-
-  if (!ALLOWED_FIELDS.has(field)) {
-    return json({ error: "Unsupported upload field." }, 400);
-  }
-
-  if (!fileName || !base64) {
-    return json({ error: "Missing file upload." }, 400);
-  }
+  const body = await request.json();
 
   try {
-    const extension = extensionFor(fileName);
-    const pathname = `site-assets/${field}.${extension}`;
-    const bytes = Buffer.from(base64, "base64");
+    const jsonResponse = await handleUpload({
+      body,
+      request,
+      onBeforeGenerateToken: async (_pathname, clientPayload) => {
+        if (clientPayload?.password !== adminPassword) {
+          throw new Error("Incorrect password.");
+        }
 
-    const blob = await put(pathname, bytes, {
-      access: "public",
-      allowOverwrite: true,
-      contentType: contentType || undefined
+        const field = clientPayload?.field;
+        const allowedFields = new Set([
+          "resume_pdf",
+          "csm_url",
+          "cspo_url",
+          "escape_image",
+          "dnd_image",
+          "common_core_image"
+        ]);
+
+        if (!allowedFields.has(field)) {
+          throw new Error("Unsupported upload field.");
+        }
+
+        const imageFields = new Set([
+          "escape_image",
+          "dnd_image",
+          "common_core_image"
+        ]);
+
+        return {
+          addRandomSuffix: false,
+          allowedContentTypes: imageFields.has(field)
+            ? ["image/jpeg", "image/png", "image/webp", "image/gif"]
+            : ["application/pdf"],
+          tokenPayload: JSON.stringify({ field })
+        };
+      },
+      onUploadCompleted: async () => {
+        return;
+      }
     });
 
-    return json({ ok: true, field, url: blob.url });
+    return Response.json(jsonResponse);
   } catch (error) {
-    return json(
-      {
-        error: error?.message || `Unable to upload file for ${field}.`
-      },
-      500
+    return Response.json(
+      { error: error.message || "Upload failed." },
+      { status: 400 }
     );
   }
 }

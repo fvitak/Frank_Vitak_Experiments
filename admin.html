@@ -144,7 +144,9 @@
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    import { upload } from "https://esm.sh/@vercel/blob/client";
+
     const DEFAULT_SITE_CONFIG = {
       summary_copy: "Certified Scrum Product Owner (CSPO) and Certified ScrumMaster (CSM) with four years of hands-on experience owning backlogs, writing user stories and acceptance criteria, and keeping cross-functional teams aligned in JIRA. I've worked across consumer-facing marketplaces and enterprise SaaS platforms, and I'm most effective at the translation layer: turning complex business requirements and stakeholder needs into clear, buildable specs. Data-driven by habit, documentation-disciplined by practice. The projects below are what I build when I'm not at work.",
       resume_page: "./resume.html",
@@ -272,29 +274,17 @@
               continue;
             }
 
-            const base64 = await fileToBase64(file);
-
-            const uploadResponse = await fetch("/api/upload", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({
+            const blob = await upload(file.name, file, {
+              access: "public",
+              handleUploadUrl: "/api/upload",
+              clientPayload: {
                 password,
-                field: fieldName,
-                fileName: file.name,
-                contentType: file.type,
-                base64
-              })
+                field: fieldName
+              }
             });
 
-            const uploadPayload = await readJsonResponse(uploadResponse);
-            if (!uploadResponse.ok) {
-              throw new Error(uploadPayload.error || `Upload failed for ${fieldName}.`);
-            }
-
-            nextConfig[fieldName] = uploadPayload.url;
-            form.elements.namedItem(fieldName).value = uploadPayload.url;
+            nextConfig[fieldName] = blob.url;
+            form.elements.namedItem(fieldName).value = blob.url;
             fileField.value = "";
           }
 

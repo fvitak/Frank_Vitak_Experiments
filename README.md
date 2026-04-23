@@ -17,7 +17,7 @@ Employer-facing static portfolio for:
 - `resume.html`: resume preview and download page
 - `admin.html`: server-backed admin editor
 - `api/config.js`: Vercel function for reading and saving live site config
-- `api/upload.js`: Vercel function for uploading files used by the live site
+- `api/upload.js`: Vercel Blob client-upload token route used by the admin page
 - `api/contact.js`: Vercel function for sending contact messages through Resend
 
 ## What to update later
