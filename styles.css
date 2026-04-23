@@ -473,6 +473,7 @@ h3 {
   width: 100%;
   min-height: 1900px;
   border: 0;
+  overflow: hidden;
 }
 
 @media (max-width: 920px) {
