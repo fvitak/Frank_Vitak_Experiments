@@ -24,15 +24,6 @@ function extensionFor(fileName) {
   return parts.length > 1 ? parts.pop().toLowerCase() : "bin";
 }
 
-function isUploadFile(value) {
-  return Boolean(
-    value &&
-    typeof value === "object" &&
-    typeof value.name === "string" &&
-    typeof value.arrayBuffer === "function"
-  );
-}
-
 export default async function handler(request) {
   if (request.method !== "POST") {
     return json({ error: "Method not allowed." }, 405);
@@ -43,10 +34,18 @@ export default async function handler(request) {
     return json({ error: "ADMIN_PASSWORD is not configured." }, 500);
   }
 
-  const formData = await request.formData();
-  const password = formData.get("password");
-  const field = formData.get("field");
-  const file = formData.get("file");
+  let body;
+  try {
+    body = await request.json();
+  } catch (error) {
+    return json({ error: "Invalid JSON body." }, 400);
+  }
+
+  const password = body.password;
+  const field = body.field;
+  const fileName = body.fileName;
+  const contentType = body.contentType;
+  const base64 = body.base64;
 
   if (password !== adminPassword) {
     return json({ error: "Incorrect password." }, 401);
@@ -56,19 +55,19 @@ export default async function handler(request) {
     return json({ error: "Unsupported upload field." }, 400);
   }
 
-  if (!isUploadFile(file)) {
+  if (!fileName || !base64) {
     return json({ error: "Missing file upload." }, 400);
   }
 
   try {
-    const extension = extensionFor(file.name);
+    const extension = extensionFor(fileName);
     const pathname = `site-assets/${field}.${extension}`;
-    const bytes = new Uint8Array(await file.arrayBuffer());
+    const bytes = Buffer.from(base64, "base64");
 
     const blob = await put(pathname, bytes, {
       access: "public",
       allowOverwrite: true,
-      contentType: file.type || undefined
+      contentType: contentType || undefined
     });
 
     return json({ ok: true, field, url: blob.url });
