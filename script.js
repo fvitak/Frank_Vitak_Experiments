@@ -146,6 +146,8 @@ function initializeContactModal() {
     document.body.style.overflow = "";
   };
 
+  window.__closeContactModal = closeModal;
+
   document.querySelectorAll("[data-contact-trigger='true']").forEach((trigger) => {
     trigger.addEventListener("click", (event) => {
       event.preventDefault();

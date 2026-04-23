@@ -216,14 +216,14 @@
   </div>
 
   <div class="contact-modal" id="contact-modal" hidden>
-    <div class="contact-modal-backdrop" data-contact-close="true"></div>
+    <div class="contact-modal-backdrop" data-contact-close="true" onclick="window.__closeContactModal && window.__closeContactModal()"></div>
     <div class="contact-modal-dialog panel">
       <div class="contact-modal-header">
         <div>
           <p class="section-label">Contact Frank</p>
           <h2>Send a direct message</h2>
         </div>
-        <button type="button" class="ghost-link contact-close" data-contact-close="true">Close</button>
+        <button type="button" class="ghost-link contact-close" data-contact-close="true" onclick="window.__closeContactModal && window.__closeContactModal()">Close</button>
       </div>
 
       <form id="contact-form" class="contact-form">
