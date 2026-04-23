@@ -352,7 +352,8 @@ h3 {
   color: var(--brand-dark);
 }
 
-.resume-frame-wrap {
+.resume-frame-wrap,
+.resume-image-wrap {
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 20px;
@@ -474,6 +475,12 @@ h3 {
   min-height: 1900px;
   border: 0;
   overflow: hidden;
+}
+
+.resume-image {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 @media (max-width: 920px) {
