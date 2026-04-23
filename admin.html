@@ -231,7 +231,10 @@
 
         const nextConfig = {};
         Object.keys(DEFAULT_SITE_CONFIG).forEach((key) => {
-          nextConfig[key] = form.elements.namedItem(key).value.trim() || DEFAULT_SITE_CONFIG[key];
+          const field = form.elements.namedItem(key);
+          nextConfig[key] = field && typeof field.value === "string" && field.value.trim()
+            ? field.value.trim()
+            : DEFAULT_SITE_CONFIG[key];
         });
 
         const uploadFields = [
