@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="description"
+    content="Frank Vitak portfolio with profile links, certifications, resume, experiments, and analytics-ready click tracking."
+  >
+  <title>Frank Vitak | Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Source+Serif+4:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <nav class="topbar" aria-label="Primary">
+        <span class="brand">Frank Vitak</span>
+        <a
+          class="ghost-link tracked-link"
+          href="https://github.com/fvitak/Frank_Vitak_Experiments"
+          target="_blank"
+          rel="noreferrer"
+          data-analytics-label="github_repo"
+        >
+          GitHub Repo
+        </a>
+      </nav>
+
+      <div class="hero-copy">
+        <p class="eyebrow">Portfolio Framework</p>
+        <h1>Simple home base for profile, credentials, resume, and experiments.</h1>
+        <p class="lead">
+          This is a lightweight starter site for Frank Vitak. Replace the placeholder
+          links as you collect the final assets and publish directly through Vercel.
+        </p>
+
+        <div class="hero-actions">
+          <a class="button tracked-link" href="#about" data-analytics-label="jump_about">Explore Site</a>
+          <a class="button button-secondary tracked-link" href="#analytics" data-analytics-label="jump_analytics">Analytics Setup</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section id="about" class="panel intro-panel">
+        <div>
+          <p class="section-label">About</p>
+          <h2>Basic public-facing information, without overbuilding the first version.</h2>
+        </div>
+        <p>
+          Use this page to centralize the essentials: LinkedIn, certifications, resume,
+          and links to the web apps you are testing. The structure is already in place so
+          later updates are mostly content edits.
+        </p>
+      </section>
+
+      <section class="grid-section">
+        <article class="panel card">
+          <p class="section-label">Profile</p>
+          <h3>LinkedIn</h3>
+          <p>Drop in your public LinkedIn profile once you are ready.</p>
+          <a
+            class="tracked-link text-link"
+            href="https://www.linkedin.com/in/frankvitak"
+            target="_blank"
+            rel="noreferrer"
+            data-analytics-label="linkedin_profile"
+          >
+            View LinkedIn profile
+          </a>
+        </article>
+
+        <article class="panel card">
+          <p class="section-label">Credentials</p>
+          <h3>CSM Certificate</h3>
+          <p>Certified ScrumMaster credential hosted directly with the portfolio.</p>
+          <a
+            class="tracked-link text-link"
+            href="./documents/frank-vitak-csm-certificate.pdf"
+            target="_blank"
+            rel="noreferrer"
+            data-analytics-label="csm_certificate"
+          >
+            View CSM certificate
+          </a>
+        </article>
+
+        <article class="panel card">
+          <p class="section-label">Credentials</p>
+          <h3>CSPO Certificate</h3>
+          <p>Certified Scrum Product Owner credential hosted directly with the portfolio.</p>
+          <a
+            class="tracked-link text-link"
+            href="./documents/frank-vitak-cspo-certificate.pdf"
+            target="_blank"
+            rel="noreferrer"
+            data-analytics-label="cspo_certificate"
+          >
+            View CSPO certificate
+          </a>
+        </article>
+
+        <article class="panel card">
+          <p class="section-label">Career</p>
+          <h3>Resume</h3>
+          <p>Open a dedicated resume page with an inline preview and a direct PDF download.</p>
+          <a
+            class="tracked-link text-link"
+            href="./resume.html"
+            data-analytics-label="resume_page"
+          >
+            View resume page
+          </a>
+        </article>
+      </section>
+
+      <section class="panel">
+        <div class="section-header">
+          <div>
+            <p class="section-label">Experiments</p>
+            <h2>Web apps you are playing around with</h2>
+          </div>
+          <a
+            class="ghost-link tracked-link"
+            href="https://github.com/fvitak/Frank_Vitak_Experiments"
+            target="_blank"
+            rel="noreferrer"
+            data-analytics-label="experiments_repo"
+          >
+            View repository
+          </a>
+        </div>
+
+        <div class="experiment-cards">
+          <a
+            class="experiment-card tracked-link"
+            href="https://escape-the-cubes.vercel.app/"
+            target="_blank"
+            rel="noreferrer"
+            data-analytics-label="escape_the_cube"
+          >
+            <div class="experiment-visual experiment-visual-cube" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div class="experiment-body">
+              <span class="experiment-kicker">Game Experiment</span>
+              <span class="experiment-name">Escape the Cube</span>
+              <span class="experiment-meta">Puzzle-style prototype deployed on Vercel.</span>
+            </div>
+          </a>
+
+          <a
+            class="experiment-card tracked-link"
+            href="https://spring-ridge-dnd.vercel.app/"
+            target="_blank"
+            rel="noreferrer"
+            data-analytics-label="dnd_simulator"
+          >
+            <div class="experiment-visual experiment-visual-dnd" aria-hidden="true">
+              <span></span>
+              <span></span>
+            </div>
+            <div class="experiment-body">
+              <span class="experiment-kicker">Tabletop Tool</span>
+              <span class="experiment-name">Dungeons and Dragons Simulator</span>
+              <span class="experiment-meta">Interactive sandbox for DnD-style encounters and play.</span>
+            </div>
+          </a>
+
+          <a
+            class="experiment-card tracked-link"
+            href="https://common-core-for-old-people.vercel.app/"
+            target="_blank"
+            rel="noreferrer"
+            data-analytics-label="common_core_old_brains"
+          >
+            <div class="experiment-visual experiment-visual-core" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div class="experiment-body">
+              <span class="experiment-kicker">Humor Experiment</span>
+              <span class="experiment-name">Common Core for Old Brains</span>
+              <span class="experiment-meta">Satirical learning concept with a dedicated landing page.</span>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <section id="analytics" class="panel analytics-panel">
+        <div class="section-header">
+          <div>
+            <p class="section-label">Analytics</p>
+            <h2>Click tracking is wired for Google Analytics later.</h2>
+          </div>
+          <span class="status-pill">Placeholder Ready</span>
+        </div>
+
+        <div class="analytics-grid">
+          <div>
+            <h3>What is already built</h3>
+            <ul>
+              <li>All major calls-to-action use `data-analytics-label` attributes.</li>
+              <li>A small script listens for clicks and sends named events if GA is configured.</li>
+              <li>Without GA, clicks are still logged in the browser console for testing.</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3>What you will add later</h3>
+            <ul>
+              <li>Your Google Analytics measurement ID.</li>
+              <li>Any future project links or supporting documents you want to publish.</li>
+              <li>An optional dashboard review in GA4 events or explorations.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="./script.js"></script>
+</body>
+</html>
