@@ -20,7 +20,7 @@
             <h2>Edit links, images, and summary content.</h2>
           </div>
           <p class="section-intro">
-            Changes are saved in this browser only. Viewing this page does not require a password, but saving changes does.
+            Changes save directly to the live site configuration and uploaded assets used by visitors.
           </p>
         </div>
 
@@ -40,6 +40,10 @@
               <input type="text" name="resume_pdf">
             </label>
             <label class="admin-field">
+              <span>Replace Resume PDF</span>
+              <input type="file" name="resume_pdf_file" accept=".pdf,application/pdf">
+            </label>
+            <label class="admin-field">
               <span>LinkedIn URL</span>
               <input type="text" name="linkedin_url">
             </label>
@@ -52,8 +56,16 @@
               <input type="text" name="csm_url">
             </label>
             <label class="admin-field">
+              <span>Replace CSM Certificate</span>
+              <input type="file" name="csm_url_file" accept=".pdf,application/pdf">
+            </label>
+            <label class="admin-field">
               <span>CSPO Certificate Link</span>
               <input type="text" name="cspo_url">
+            </label>
+            <label class="admin-field">
+              <span>Replace CSPO Certificate</span>
+              <input type="file" name="cspo_url_file" accept=".pdf,application/pdf">
             </label>
             <label class="admin-field">
               <span>Escape the Cube URL</span>
@@ -64,12 +76,20 @@
               <input type="text" name="escape_image">
             </label>
             <label class="admin-field">
+              <span>Replace Escape the Cube Image</span>
+              <input type="file" name="escape_image_file" accept="image/*">
+            </label>
+            <label class="admin-field">
               <span>DnD Simulator URL</span>
               <input type="text" name="dnd_url">
             </label>
             <label class="admin-field">
               <span>DnD Simulator Image</span>
               <input type="text" name="dnd_image">
+            </label>
+            <label class="admin-field">
+              <span>Replace DnD Image</span>
+              <input type="file" name="dnd_image_file" accept="image/*">
             </label>
             <label class="admin-field">
               <span>Common Core URL</span>
@@ -79,16 +99,14 @@
               <span>Common Core Image</span>
               <input type="text" name="common_core_image">
             </label>
+            <label class="admin-field">
+              <span>Replace Common Core Image</span>
+              <input type="file" name="common_core_image_file" accept="image/*">
+            </label>
           </div>
-
-          <label class="admin-field password-field">
-            <span>Save Password</span>
-            <input type="password" name="save_password" placeholder="Ravens4theWin#1">
-          </label>
 
           <div class="admin-actions">
             <button type="submit" class="button">Save Changes</button>
-            <button type="button" class="ghost-link" id="reset-config">Reset Browser Changes</button>
             <a class="ghost-link" href="./index.html">Back To Site</a>
           </div>
 

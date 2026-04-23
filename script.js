@@ -1,6 +1,4 @@
-const GA_MEASUREMENT_ID = "G-XXXXXXXXXX";
-const ADMIN_STORAGE_KEY = "frank-vitak-portfolio-config";
-const ADMIN_SAVE_PASSWORD = "Ravens4theWin#1";
+const GA_MEASUREMENT_ID = "G-GLK6VP4QSH";
 const DEFAULT_SITE_CONFIG = {
   summary_copy: "Certified Scrum Product Owner (CSPO) and Certified ScrumMaster (CSM) with four years of hands-on experience owning backlogs, writing user stories and acceptance criteria, and keeping cross-functional teams aligned in JIRA. I've worked across consumer-facing marketplaces and enterprise SaaS platforms, and I'm most effective at the translation layer: turning complex business requirements and stakeholder needs into clear, buildable specs. Data-driven by habit, documentation-disciplined by practice. The projects below are what I build when I'm not at work.",
   resume_page: "./resume.html",
@@ -40,25 +38,25 @@ function setupGoogleAnalytics(measurementId) {
 
 const analyticsEnabled = setupGoogleAnalytics(GA_MEASUREMENT_ID);
 
-function getStoredConfig() {
+async function getSiteConfig() {
   try {
-    const raw = window.localStorage.getItem(ADMIN_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : {};
+    const response = await fetch("/api/config", { cache: "no-store" });
+    if (!response.ok) {
+      return DEFAULT_SITE_CONFIG;
+    }
+
+    const payload = await response.json();
+    return {
+      ...DEFAULT_SITE_CONFIG,
+      ...(payload.config || {})
+    };
   } catch (error) {
-    console.warn("Unable to load stored portfolio config.", error);
-    return {};
+    console.warn("Unable to load portfolio config from server.", error);
+    return DEFAULT_SITE_CONFIG;
   }
 }
 
-function getSiteConfig() {
-  return {
-    ...DEFAULT_SITE_CONFIG,
-    ...getStoredConfig()
-  };
-}
-
-function applySiteConfig() {
-  const config = getSiteConfig();
+function applySiteConfig(config) {
 
   document.querySelectorAll("[data-config-text]").forEach((element) => {
     const key = element.dataset.configText;
@@ -125,52 +123,90 @@ function initializeAdminPage() {
   }
 
   const status = document.querySelector("#admin-status");
-  const resetButton = document.querySelector("#reset-config");
-  const config = getSiteConfig();
-
-  Object.entries(DEFAULT_SITE_CONFIG).forEach(([key, value]) => {
-    const field = form.elements.namedItem(key);
-    if (field) {
-      field.value = config[key] || value;
-    }
+  getSiteConfig().then((config) => {
+    Object.entries(DEFAULT_SITE_CONFIG).forEach(([key, value]) => {
+      const field = form.elements.namedItem(key);
+      if (field) {
+        field.value = config[key] || value;
+      }
+    });
   });
 
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
-    const password = form.elements.namedItem("save_password").value;
-
-    if (password !== ADMIN_SAVE_PASSWORD) {
-      status.textContent = "Incorrect password. Changes were not saved.";
-      status.dataset.state = "error";
-      return;
-    }
-
     const nextConfig = {};
     Object.keys(DEFAULT_SITE_CONFIG).forEach((key) => {
       nextConfig[key] = form.elements.namedItem(key).value.trim() || DEFAULT_SITE_CONFIG[key];
     });
 
-    window.localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(nextConfig));
-    status.textContent = "Changes saved in this browser.";
-    status.dataset.state = "success";
-    form.elements.namedItem("save_password").value = "";
-  });
+    const uploadFields = [
+      "resume_pdf",
+      "csm_url",
+      "cspo_url",
+      "escape_image",
+      "dnd_image",
+      "common_core_image"
+    ];
 
-  resetButton.addEventListener("click", () => {
-    window.localStorage.removeItem(ADMIN_STORAGE_KEY);
-    Object.entries(DEFAULT_SITE_CONFIG).forEach(([key, value]) => {
-      const field = form.elements.namedItem(key);
-      if (field) {
-        field.value = value;
+    status.textContent = "Saving changes...";
+    status.dataset.state = "";
+
+    try {
+      for (const fieldName of uploadFields) {
+        const fileField = form.elements.namedItem(`${fieldName}_file`);
+        const file = fileField?.files?.[0];
+
+        if (!file) {
+          continue;
+        }
+
+        const uploadData = new FormData();
+        uploadData.append("field", fieldName);
+        uploadData.append("file", file);
+
+        const uploadResponse = await fetch("/api/upload", {
+          method: "POST",
+          body: uploadData
+        });
+
+        const uploadPayload = await uploadResponse.json();
+        if (!uploadResponse.ok) {
+          throw new Error(uploadPayload.error || `Upload failed for ${fieldName}.`);
+        }
+
+        nextConfig[fieldName] = uploadPayload.url;
+        form.elements.namedItem(fieldName).value = uploadPayload.url;
+        fileField.value = "";
       }
-    });
-    form.elements.namedItem("save_password").value = "";
-    status.textContent = "Browser-side changes reset to defaults.";
-    status.dataset.state = "success";
+
+      const saveResponse = await fetch("/api/config", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          config: nextConfig
+        })
+      });
+
+      const savePayload = await saveResponse.json();
+      if (!saveResponse.ok) {
+        throw new Error(savePayload.error || "Unable to save config.");
+      }
+
+      status.textContent = "Changes saved for all visitors.";
+      status.dataset.state = "success";
+    } catch (error) {
+      status.textContent = error.message || "Unable to save changes.";
+      status.dataset.state = "error";
+    }
   });
 }
 
-applySiteConfig();
-bindTrackedLinks();
-injectAdminButton();
-initializeAdminPage();
+(async function initializeSite() {
+  const config = await getSiteConfig();
+  applySiteConfig(config);
+  bindTrackedLinks();
+  injectAdminButton();
+  initializeAdminPage();
+})();
