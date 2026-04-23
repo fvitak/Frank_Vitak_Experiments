@@ -63,8 +63,9 @@ export default async function handler(request) {
   try {
     const extension = extensionFor(file.name);
     const pathname = `site-assets/${field}.${extension}`;
+    const bytes = new Uint8Array(await file.arrayBuffer());
 
-    const blob = await put(pathname, file, {
+    const blob = await put(pathname, bytes, {
       access: "public",
       allowOverwrite: true,
       contentType: file.type || undefined
