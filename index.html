@@ -47,9 +47,9 @@
             </a>
             <a
               class="resource-row tracked-link"
-              href="mailto:fvitak@gmail.com"
+              href="#contact-form"
               data-analytics-label="resource_email"
-              data-config-link="email_url"
+              data-contact-trigger="true"
             >
               <span class="resource-label">Email</span>
               <span class="resource-meta">Direct contact for recruiters and hiring teams</span>
@@ -215,6 +215,40 @@
     </main>
   </div>
 
-  <script src="./script.js"></script>
+  <div class="contact-modal" id="contact-modal" hidden>
+    <div class="contact-modal-backdrop" data-contact-close="true"></div>
+    <div class="contact-modal-dialog panel">
+      <div class="contact-modal-header">
+        <div>
+          <p class="section-label">Contact Frank</p>
+          <h2>Send a direct message</h2>
+        </div>
+        <button type="button" class="ghost-link contact-close" data-contact-close="true">Close</button>
+      </div>
+
+      <form id="contact-form" class="contact-form">
+        <label class="admin-field">
+          <span>Name</span>
+          <input type="text" name="name" required>
+        </label>
+        <label class="admin-field">
+          <span>Email Address</span>
+          <input type="email" name="email" required>
+        </label>
+        <label class="admin-field">
+          <span>Message</span>
+          <textarea name="message" rows="7" required></textarea>
+        </label>
+
+        <div class="admin-actions">
+          <button type="submit" class="button">Send Message</button>
+        </div>
+
+        <p id="contact-status" class="admin-status"></p>
+      </form>
+    </div>
+  </div>
+
+  <script src="./script.js?v=20260423-1"></script>
 </body>
 </html>
