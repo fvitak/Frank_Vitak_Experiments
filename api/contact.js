@@ -1,7 +1,3 @@
-import { Resend } from "resend";
-
-const CONTACT_SEGMENT_ID = "7f67cf1b-9598-4baf-9aa4-0a120ba1941d";
-
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -10,6 +6,24 @@ function json(data, status = 200) {
       "Cache-Control": "no-store"
     }
   });
+}
+
+function withTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      setTimeout(() => reject(new Error("CONTACT_TIMEOUT")), ms);
+    })
+  ]);
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 export default async function handler(request) {
@@ -40,34 +54,51 @@ export default async function handler(request) {
     return json({ error: "Name, email, and message are required." }, 400);
   }
 
-  const resend = new Resend(resendApiKey);
-
   try {
-    await resend.emails.send({
-      from: resendFromEmail,
-      to: [contactToEmail],
-      subject: `Portfolio contact from ${name}`,
-      replyTo: email,
-      html: `
-        <h2>New portfolio contact</h2>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Message:</strong></p>
-        <p>${message.replace(/\n/g, "<br>")}</p>
-      `
-    });
+    const response = await withTimeout(
+      fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${resendApiKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          from: resendFromEmail,
+          to: [contactToEmail],
+          subject: `Portfolio contact from ${name}`,
+          reply_to: email,
+          text: `New portfolio contact\n\nName: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
+          html: `
+            <h2>New portfolio contact</h2>
+            <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+            <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+            <p><strong>Message:</strong></p>
+            <p>${escapeHtml(message).replace(/\n/g, "<br>")}</p>
+          `
+        })
+      }),
+      10000
+    );
 
-    try {
-      await resend.contacts.segments.add({
-        email,
-        segmentId: CONTACT_SEGMENT_ID
-      });
-    } catch (error) {
-      console.warn("Unable to add contact to Resend segment.", error);
+    const rawBody = await withTimeout(response.text(), 5000);
+    const payload = rawBody ? JSON.parse(rawBody) : {};
+    if (!response.ok) {
+      return json(
+        { error: payload.message || payload.error || "Unable to send message." },
+        response.status
+      );
     }
 
     return json({ ok: true });
   } catch (error) {
-    return json({ error: "Unable to send message." }, 500);
+    return json(
+      {
+        error:
+          error.message === "CONTACT_TIMEOUT"
+            ? "Contact request timed out."
+            : "Unable to send message."
+      },
+      500
+    );
   }
 }
