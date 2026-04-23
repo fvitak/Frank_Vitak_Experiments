@@ -1,6 +1,6 @@
 # Frank Vitak Portfolio
 
-Simple static portfolio starter for:
+Employer-facing static portfolio for:
 
 - LinkedIn profile
 - CSM certificate
@@ -11,8 +11,8 @@ Simple static portfolio starter for:
 
 ## Files
 
-- `index.html`: page structure and placeholder content
-- `styles.css`: layout and visual styling
+- `index.html`: employer-facing homepage with selected work, resume, credentials, and contact
+- `styles.css`: shared visual system and responsive layout
 - `script.js`: click tracking and Google Analytics placeholder setup
 - `resume.html`: resume preview and download page
 
