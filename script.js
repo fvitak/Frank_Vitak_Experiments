@@ -57,7 +57,6 @@ async function getSiteConfig() {
 }
 
 function applySiteConfig(config) {
-
   document.querySelectorAll("[data-config-text]").forEach((element) => {
     const key = element.dataset.configText;
     if (config[key]) {
@@ -75,7 +74,11 @@ function applySiteConfig(config) {
   document.querySelectorAll("[data-config-src]").forEach((element) => {
     const key = element.dataset.configSrc;
     if (config[key]) {
-      element.setAttribute("src", config[key]);
+      const isResumeFrame = element.classList.contains("resume-frame");
+      const nextSrc = isResumeFrame
+        ? `${config[key]}#toolbar=0&navpanes=0&scrollbar=0`
+        : config[key];
+      element.setAttribute("src", nextSrc);
     }
   });
 }
@@ -109,6 +112,10 @@ function bindTrackedLinks() {
 }
 
 function injectAdminButton() {
+  if (document.querySelector(".admin-launch")) {
+    return;
+  }
+
   const adminButton = document.createElement("a");
   adminButton.href = "./admin.html";
   adminButton.className = "admin-launch";

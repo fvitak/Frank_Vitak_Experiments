@@ -45,7 +45,7 @@ a {
 .admin-launch {
   position: fixed;
   top: 12px;
-  left: 12px;
+  right: 12px;
   z-index: 1000;
   display: inline-flex;
   align-items: center;
@@ -125,6 +125,16 @@ h3 {
   font-size: clamp(2.4rem, 5.4vw, 4.2rem);
 }
 
+.resume-name {
+  font-size: 1.15rem;
+}
+
+.resume-title {
+  max-width: none;
+  font-size: clamp(3.2rem, 6.6vw, 5.2rem);
+  line-height: 0.95;
+}
+
 .lead,
 .panel p {
   font-size: 1rem;
@@ -186,6 +196,24 @@ h3 {
 .resume-panel,
 .admin-panel {
   margin-top: 24px;
+}
+
+.subpage-hero .hero-copy {
+  max-width: none;
+  padding-top: 56px;
+}
+
+.subpage-hero .hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.subpage-hero .hero-actions .text-link,
+.subpage-hero .hero-actions .lead,
+.subpage-hero .eyebrow {
+  display: none;
 }
 
 .section-header {
