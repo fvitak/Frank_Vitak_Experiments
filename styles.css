@@ -206,6 +206,10 @@ h3 {
   margin: 0;
 }
 
+.overview-copy {
+  align-self: start;
+}
+
 .resource-list {
   margin-top: 20px;
 }
