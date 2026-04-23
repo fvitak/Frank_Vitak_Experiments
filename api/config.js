@@ -66,6 +66,15 @@ export default async function handler(request) {
     return json({ error: "Invalid JSON body." }, 400);
   }
 
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  if (!adminPassword) {
+    return json({ error: "ADMIN_PASSWORD is not configured." }, 500);
+  }
+
+  if (body.password !== adminPassword) {
+    return json({ error: "Incorrect password." }, 401);
+  }
+
   const nextConfig = {};
   for (const [key, value] of Object.entries(DEFAULT_SITE_CONFIG)) {
     nextConfig[key] = typeof body.config?.[key] === "string" && body.config[key].trim()

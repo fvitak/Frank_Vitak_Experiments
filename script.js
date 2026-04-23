@@ -216,6 +216,14 @@ function initializeAdminPage() {
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
+    const password = window.prompt("Enter admin password to save changes:");
+
+    if (!password) {
+      status.textContent = "Save cancelled.";
+      status.dataset.state = "error";
+      return;
+    }
+
     const nextConfig = {};
     Object.keys(DEFAULT_SITE_CONFIG).forEach((key) => {
       nextConfig[key] = form.elements.namedItem(key).value.trim() || DEFAULT_SITE_CONFIG[key];
@@ -243,6 +251,7 @@ function initializeAdminPage() {
         }
 
         const uploadData = new FormData();
+        uploadData.append("password", password);
         uploadData.append("field", fieldName);
         uploadData.append("file", file);
 
@@ -267,6 +276,7 @@ function initializeAdminPage() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
+          password,
           config: nextConfig
         })
       });

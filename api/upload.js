@@ -38,9 +38,19 @@ export default async function handler(request) {
     return json({ error: "Method not allowed." }, 405);
   }
 
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  if (!adminPassword) {
+    return json({ error: "ADMIN_PASSWORD is not configured." }, 500);
+  }
+
   const formData = await request.formData();
+  const password = formData.get("password");
   const field = formData.get("field");
   const file = formData.get("file");
+
+  if (password !== adminPassword) {
+    return json({ error: "Incorrect password." }, 401);
+  }
 
   if (!ALLOWED_FIELDS.has(field)) {
     return json({ error: "Unsupported upload field." }, 400);
