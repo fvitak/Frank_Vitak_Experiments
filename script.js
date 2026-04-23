@@ -39,8 +39,14 @@ function setupGoogleAnalytics(measurementId) {
 const analyticsEnabled = setupGoogleAnalytics(GA_MEASUREMENT_ID);
 
 async function getSiteConfig() {
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), 5000);
+
   try {
-    const response = await fetch("/api/config", { cache: "no-store" });
+    const response = await fetch("/api/config", {
+      cache: "no-store",
+      signal: controller.signal
+    });
     if (!response.ok) {
       return DEFAULT_SITE_CONFIG;
     }
@@ -53,6 +59,8 @@ async function getSiteConfig() {
   } catch (error) {
     console.warn("Unable to load portfolio config from server.", error);
     return DEFAULT_SITE_CONFIG;
+  } finally {
+    window.clearTimeout(timeoutId);
   }
 }
 
@@ -146,6 +154,7 @@ function initializeContactModal() {
     document.body.style.overflow = "";
   };
 
+  window.__openContactModal = openModal;
   window.__closeContactModal = closeModal;
 
   document.querySelectorAll("[data-contact-trigger='true']").forEach((trigger) => {
@@ -343,9 +352,10 @@ function initializeAdminPage() {
 }
 
 (async function initializeSite() {
+  bindTrackedLinks();
+  initializeContactModal();
+  initializeAdminPage();
+
   const config = await getSiteConfig();
   applySiteConfig(config);
-  bindTrackedLinks();
-  initializeAdminPage();
-  initializeContactModal();
 })();
