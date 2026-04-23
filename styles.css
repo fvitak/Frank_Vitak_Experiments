@@ -82,17 +82,19 @@ h3 {
   letter-spacing: 0.12em;
 }
 
-.nameplate {
+.overview-panel .nameplate {
   margin: 0;
   font-size: 3.3rem;
   font-weight: 500;
+  line-height: 1;
   letter-spacing: -0.02em;
   text-transform: uppercase;
   color: var(--ink);
 }
 
-.section-label {
+.overview-panel .section-label {
   font-size: 0.78rem;
+  line-height: 1.2;
   letter-spacing: 0.12em;
 }
 
