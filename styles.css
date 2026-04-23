@@ -361,6 +361,45 @@ h3 {
   margin-top: 28px;
 }
 
+.contact-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.contact-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(29, 28, 26, 0.36);
+  backdrop-filter: blur(6px);
+}
+
+.contact-modal-dialog {
+  position: relative;
+  z-index: 1;
+  width: min(640px, 100%);
+}
+
+.contact-modal-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: start;
+}
+
+.contact-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.contact-close {
+  min-height: 40px;
+}
+
 .admin-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -405,6 +444,12 @@ h3 {
 .admin-status {
   margin: 0;
   color: var(--muted);
+}
+
+.admin-build {
+  margin: 10px 0 0;
+  color: var(--brand-dark);
+  font-size: 0.95rem;
 }
 
 .admin-status[data-state="error"] {

@@ -19,6 +19,7 @@
           <div>
             <p class="section-label">Admin</p>
             <h2>Edit links, images, and summary content.</h2>
+            <p class="admin-build">Build `admin-v3`</p>
           </div>
           <p class="section-intro">
             Changes save directly to the live site configuration and uploaded assets used by visitors.
@@ -107,7 +108,7 @@
           </div>
 
           <div class="admin-actions">
-            <button type="button" class="button" id="admin-save-button">Save Changes</button>
+            <button type="button" class="button" id="admin-save-button" onclick="window.__openAdminPasswordModal && window.__openAdminPasswordModal()">Save Changes</button>
             <a class="ghost-link" href="./index.html">Back To Site</a>
           </div>
 
@@ -215,6 +216,8 @@
         document.body.style.overflow = "hidden";
         passwordInput.focus();
       };
+
+      window.__openAdminPasswordModal = openPasswordModal;
 
       const closePasswordModal = () => {
         passwordModal.hidden = true;
