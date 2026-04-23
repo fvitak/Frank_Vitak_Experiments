@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Simple admin editor for the Frank Vitak portfolio.">
+  <title>Frank Vitak | Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Source+Serif+4:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <main>
+      <section class="panel admin-panel">
+        <div class="section-header admin-header">
+          <div>
+            <p class="section-label">Admin</p>
+            <h2>Edit links, images, and summary content.</h2>
+          </div>
+          <p class="section-intro">
+            Changes are saved in this browser only. Viewing this page does not require a password, but saving changes does.
+          </p>
+        </div>
+
+        <form id="admin-form" class="admin-form">
+          <label class="admin-field">
+            <span>Professional Summary</span>
+            <textarea name="summary_copy" rows="6"></textarea>
+          </label>
+
+          <div class="admin-grid">
+            <label class="admin-field">
+              <span>Resume Page Link</span>
+              <input type="text" name="resume_page">
+            </label>
+            <label class="admin-field">
+              <span>Resume PDF Link</span>
+              <input type="text" name="resume_pdf">
+            </label>
+            <label class="admin-field">
+              <span>LinkedIn URL</span>
+              <input type="text" name="linkedin_url">
+            </label>
+            <label class="admin-field">
+              <span>Email Link</span>
+              <input type="text" name="email_url">
+            </label>
+            <label class="admin-field">
+              <span>CSM Certificate Link</span>
+              <input type="text" name="csm_url">
+            </label>
+            <label class="admin-field">
+              <span>CSPO Certificate Link</span>
+              <input type="text" name="cspo_url">
+            </label>
+            <label class="admin-field">
+              <span>Escape the Cube URL</span>
+              <input type="text" name="escape_url">
+            </label>
+            <label class="admin-field">
+              <span>Escape the Cube Image</span>
+              <input type="text" name="escape_image">
+            </label>
+            <label class="admin-field">
+              <span>DnD Simulator URL</span>
+              <input type="text" name="dnd_url">
+            </label>
+            <label class="admin-field">
+              <span>DnD Simulator Image</span>
+              <input type="text" name="dnd_image">
+            </label>
+            <label class="admin-field">
+              <span>Common Core URL</span>
+              <input type="text" name="common_core_url">
+            </label>
+            <label class="admin-field">
+              <span>Common Core Image</span>
+              <input type="text" name="common_core_image">
+            </label>
+          </div>
+
+          <label class="admin-field password-field">
+            <span>Save Password</span>
+            <input type="password" name="save_password" placeholder="Ravens4theWin#1">
+          </label>
+
+          <div class="admin-actions">
+            <button type="submit" class="button">Save Changes</button>
+            <button type="button" class="ghost-link" id="reset-config">Reset Browser Changes</button>
+            <a class="ghost-link" href="./index.html">Back To Site</a>
+          </div>
+
+          <p id="admin-status" class="admin-status"></p>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <script src="./script.js"></script>
+</body>
+</html>
