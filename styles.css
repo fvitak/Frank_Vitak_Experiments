@@ -174,7 +174,7 @@ h3 {
 }
 
 .hero-actions {
-  grid-template-columns: repeat(3, max-content);
+  grid-template-columns: repeat(4, max-content);
   align-items: center;
   margin-top: 34px;
 }
@@ -282,6 +282,10 @@ h3 {
   margin-top: 28px;
 }
 
+.compact-project-list {
+  gap: 18px;
+}
+
 .project-card {
   display: grid;
   grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
@@ -291,6 +295,12 @@ h3 {
   border-radius: 26px;
   background: var(--panel-strong);
   box-shadow: var(--shadow);
+}
+
+.compact-project-card {
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 18px;
+  padding: 14px;
 }
 
 .project-card:hover,
@@ -320,11 +330,21 @@ h3 {
   background: rgba(255, 255, 255, 0.56);
 }
 
+.compact-project-image {
+  min-height: 150px;
+  max-height: 170px;
+}
+
 .project-content {
   display: grid;
   gap: 14px;
   align-content: start;
   padding: 8px 4px 8px 0;
+}
+
+.compact-project-content {
+  gap: 10px;
+  padding-top: 2px;
 }
 
 .project-kicker {
@@ -336,6 +356,11 @@ h3 {
   font-size: 1.2rem;
   line-height: 1.55;
   color: var(--ink);
+}
+
+.compact-project-summary {
+  font-size: 1.02rem;
+  line-height: 1.5;
 }
 
 .project-copy {
@@ -435,6 +460,15 @@ h3 {
   .resource-row,
   .credential-row {
     flex-direction: column;
+  }
+
+  .compact-project-card {
+    grid-template-columns: 1fr;
+  }
+
+  .compact-project-image {
+    min-height: 220px;
+    max-height: 260px;
   }
 }
 
