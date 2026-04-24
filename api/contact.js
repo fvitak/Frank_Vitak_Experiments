@@ -47,7 +47,7 @@ export default async function handler(request) {
   try {
     const resend = new Resend(resendApiKey);
 
-    await resend.emails.send({
+    const sendPromise = resend.emails.send({
       from: "Frank Vitak <onboarding@resend.dev>",
       to: ["fvitak@gmail.com"],
       subject: `Portfolio contact from ${name}`,
@@ -61,6 +61,12 @@ export default async function handler(request) {
         <p>${escapeHtml(message).replace(/\n/g, "<br>")}</p>
       `
     });
+
+    const timeout = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Resend timed out")), 8000)
+    );
+
+    await Promise.race([sendPromise, timeout]);
 
     return json({ ok: true });
   } catch (error) {
