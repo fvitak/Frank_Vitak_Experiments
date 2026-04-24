@@ -3,22 +3,356 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Admin page disabled for the Frank Vitak portfolio.">
-  <title>Frank Vitak | Admin</title>
+  <meta name="robots" content="noindex">
+  <meta name="description" content="Analytics dashboard for the Frank Vitak portfolio.">
+  <title>Frank Vitak | Analytics</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css">
+  <style>
+    .analytics-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .range-group {
+      display: flex;
+      gap: 6px;
+    }
+
+    .range-btn {
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border: 1px solid var(--line);
+      border-radius: 99px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .range-btn:hover {
+      color: var(--ink);
+      border-color: rgba(29, 28, 26, 0.3);
+    }
+
+    .range-btn.active {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 560px) {
+      .stat-grid { grid-template-columns: 1fr; }
+    }
+
+    .stat-card {
+      padding: 24px;
+    }
+
+    .stat-card .section-label {
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 2.4rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin: 0;
+    }
+
+    .analytics-section {
+      margin-bottom: 16px;
+    }
+
+    .analytics-section .section-label {
+      margin-bottom: 16px;
+    }
+
+    .sparkline-wrap {
+      width: 100%;
+      height: 80px;
+    }
+
+    .sparkline-wrap svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      overflow: visible;
+    }
+
+    .analytics-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .analytics-table th {
+      text-align: left;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0 12px 12px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .analytics-table td {
+      padding: 12px 12px 12px 0;
+      border-bottom: 1px solid var(--line);
+      vertical-align: middle;
+    }
+
+    .analytics-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .label-name {
+      display: block;
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    .label-key {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .count-cell {
+      font-variant-numeric: tabular-nums;
+      font-weight: 500;
+      white-space: nowrap;
+      width: 60px;
+    }
+
+    .bar-cell {
+      width: 40%;
+    }
+
+    .bar-track {
+      height: 6px;
+      background: var(--line);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: var(--brand);
+      border-radius: 99px;
+      transition: width 0.4s ease;
+    }
+
+    .analytics-empty {
+      color: var(--muted);
+      font-size: 0.9rem;
+      padding: 8px 0;
+    }
+
+    .analytics-error-msg {
+      color: var(--brand);
+      font-weight: 500;
+    }
+
+    #analytics-loading {
+      padding: 40px 32px;
+      color: var(--muted);
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
   <div class="page-shell">
     <main>
-      <section class="panel admin-panel">
-        <p class="section-label">Admin</p>
-        <h2>Admin page cleared.</h2>
-        <a class="ghost-link" href="./index.html">Back To Site</a>
+      <section class="panel" style="margin-bottom: 16px;">
+        <div class="analytics-topbar">
+          <div>
+            <p class="section-label">Portfolio</p>
+            <h1 style="margin: 0;">Google Analytics</h1>
+          </div>
+          <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+            <div class="range-group" id="range-group">
+              <button class="range-btn" data-days="7">7 days</button>
+              <button class="range-btn active" data-days="30">30 days</button>
+              <button class="range-btn" data-days="90">90 days</button>
+            </div>
+            <a class="ghost-link" href="./index.html">Back to site</a>
+          </div>
+        </div>
       </section>
+
+      <div id="analytics-loading" class="panel">Loading analytics&hellip;</div>
+
+      <div id="analytics-error" class="panel" hidden>
+        <p class="section-label">Error</p>
+        <p class="analytics-error-msg" id="analytics-error-msg"></p>
+      </div>
+
+      <div id="analytics-content" hidden>
+
+        <div class="stat-grid">
+          <div class="panel stat-card">
+            <p class="section-label">Sessions</p>
+            <p class="stat-value" id="stat-sessions">—</p>
+          </div>
+          <div class="panel stat-card">
+            <p class="section-label">Unique Visitors</p>
+            <p class="stat-value" id="stat-users">—</p>
+          </div>
+          <div class="panel stat-card">
+            <p class="section-label">Page Views</p>
+            <p class="stat-value" id="stat-pageviews">—</p>
+          </div>
+        </div>
+
+        <div class="panel analytics-section">
+          <p class="section-label">Sessions over time</p>
+          <div class="sparkline-wrap" id="sparkline-wrap"></div>
+        </div>
+
+        <div class="panel analytics-section">
+          <p class="section-label">Button clicks</p>
+          <div id="clicks-container"></div>
+        </div>
+
+      </div>
     </main>
   </div>
+
+  <script>
+    const LABEL_NAMES = {
+      resource_resume_page:     "Resume Page",
+      resource_linkedin:        "LinkedIn",
+      resource_email:           "Email / Contact",
+      credential_csm:           "CSM Certificate",
+      credential_cspo:          "CSPO Certificate",
+      project_escape_cube:      "Escape the Cube",
+      project_escape_cube_live: "Escape the Cube \u2192 Live",
+      project_dnd_simulator:    "D&D Simulator",
+      project_dnd_simulator_live: "D&D Simulator \u2192 Live",
+      project_common_core:      "Common Core",
+      project_common_core_live: "Common Core \u2192 Live",
+      resume_back_home:         "Resume \u2192 Back Home",
+      resume_open_pdf:          "Resume \u2192 Open PDF",
+      resume_download_pdf:      "Resume \u2192 Download PDF",
+      resume_download_secondary:"Resume \u2192 Download (alt)"
+    };
+
+    function buildSparkline(trendRows) {
+      if (!trendRows.length) {
+        return '<p class="analytics-empty">No trend data available.</p>';
+      }
+
+      const W = 600, H = 72, PAD = 4;
+      const values = trendRows.map(r => r.sessions);
+      const maxVal = Math.max(...values, 1);
+      const pts = values.map((v, i) => {
+        const x = values.length === 1 ? W / 2 : (i / (values.length - 1)) * W;
+        const y = PAD + (1 - v / maxVal) * (H - PAD * 2);
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      });
+
+      const polyline = pts.join(" ");
+      const fill = `0,${H} ${pts[0].split(",")[0]},${H} ${polyline} ${pts[pts.length - 1].split(",")[0]},${H}`;
+
+      return `
+        <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#b44c2f" stop-opacity="0.18"/>
+              <stop offset="100%" stop-color="#b44c2f" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <polygon points="${fill}" fill="url(#sg)"/>
+          <polyline points="${polyline}" fill="none" stroke="#b44c2f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>`;
+    }
+
+    function buildClicksTable(clicks) {
+      if (!clicks.length) {
+        return '<p class="analytics-empty">No click data yet. Make sure "label" is registered as a custom event dimension in GA4 (Admin \u2192 Custom Definitions).</p>';
+      }
+
+      const maxCount = clicks[0].count;
+      const rows = clicks.map(({ label, count }) => {
+        const name = LABEL_NAMES[label] || label;
+        const pct = Math.round((count / maxCount) * 100);
+        return `
+          <tr>
+            <td><span class="label-name">${name}</span><span class="label-key">${label}</span></td>
+            <td class="count-cell">${count.toLocaleString()}</td>
+            <td class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div></td>
+          </tr>`;
+      }).join("");
+
+      return `
+        <table class="analytics-table">
+          <thead><tr><th>Action</th><th>Clicks</th><th></th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>`;
+    }
+
+    async function loadAnalytics(days) {
+      const loading = document.getElementById("analytics-loading");
+      const errorEl = document.getElementById("analytics-error");
+      const content = document.getElementById("analytics-content");
+
+      loading.hidden = false;
+      errorEl.hidden = true;
+      content.hidden = true;
+
+      try {
+        const res = await fetch(`/api/analytics?days=${days}`);
+        const data = await res.json();
+
+        if (!res.ok || data.error) {
+          throw new Error(data.error || "Failed to load analytics.");
+        }
+
+        document.getElementById("stat-sessions").textContent = parseInt(data.summary.sessions).toLocaleString();
+        document.getElementById("stat-users").textContent = parseInt(data.summary.users).toLocaleString();
+        document.getElementById("stat-pageviews").textContent = parseInt(data.summary.pageViews).toLocaleString();
+
+        document.getElementById("sparkline-wrap").innerHTML = buildSparkline(data.trend);
+        document.getElementById("clicks-container").innerHTML = buildClicksTable(data.clicks);
+
+        loading.hidden = true;
+        content.hidden = false;
+      } catch (err) {
+        loading.hidden = true;
+        document.getElementById("analytics-error-msg").textContent = err.message;
+        errorEl.hidden = false;
+      }
+    }
+
+    document.getElementById("range-group").addEventListener("click", (e) => {
+      const btn = e.target.closest(".range-btn");
+      if (!btn) return;
+      document.querySelectorAll(".range-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      loadAnalytics(parseInt(btn.dataset.days));
+    });
+
+    loadAnalytics(30);
+  </script>
 </body>
 </html>

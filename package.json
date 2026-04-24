@@ -5,6 +5,7 @@
   "type": "module",
   "dependencies": {
     "@vercel/blob": "^1.1.1",
+    "google-auth-library": "^9.0.0",
     "resend": "^6.12.0"
   }
 }
