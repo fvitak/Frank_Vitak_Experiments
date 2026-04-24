@@ -1,5 +1,3 @@
-import { JWT } from "google-auth-library";
-
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -7,14 +5,20 @@ function json(data, status = 200) {
   });
 }
 
-async function getAccessToken(serviceAccount) {
-  const client = new JWT({
-    email: serviceAccount.client_email,
-    key: serviceAccount.private_key,
-    scopes: ["https://www.googleapis.com/auth/analytics.readonly"]
+async function getAccessToken() {
+  const res = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      client_id: process.env.GOOGLE_CLIENT_ID,
+      client_secret: process.env.GOOGLE_CLIENT_SECRET,
+      refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
+      grant_type: "refresh_token"
+    })
   });
-  const result = await client.getAccessToken();
-  return result.token;
+  const data = await res.json();
+  if (!data.access_token) throw new Error("Failed to get access token from Google.");
+  return data.access_token;
 }
 
 async function runReport(accessToken, propertyId, body) {
@@ -40,9 +44,7 @@ export default async function handler(request) {
   }
 
   const propertyId = process.env.GA4_PROPERTY_ID;
-  const serviceAccountJson = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
-
-  if (!propertyId || !serviceAccountJson) {
+  if (!propertyId || !process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET || !process.env.GOOGLE_REFRESH_TOKEN) {
     return json({ error: "Analytics not configured." }, 500);
   }
 
@@ -52,8 +54,7 @@ export default async function handler(request) {
   const dateRange = { startDate: `${days}daysAgo`, endDate: "today" };
 
   try {
-    const serviceAccount = JSON.parse(serviceAccountJson);
-    const accessToken = await getAccessToken(serviceAccount);
+    const accessToken = await getAccessToken();
 
     const [overview, clicks, trend] = await Promise.all([
       runReport(accessToken, propertyId, {
