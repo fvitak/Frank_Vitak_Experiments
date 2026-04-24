@@ -188,6 +188,7 @@
           <div>
             <p class="section-label">Portfolio</p>
             <h1 style="margin: 0;">Google Analytics</h1>
+            <p id="date-range" style="margin: 4px 0 0; color: var(--muted); font-size: 0.9rem;"></p>
           </div>
           <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
             <div class="range-group" id="range-group">
@@ -209,23 +210,13 @@
 
       <div id="analytics-content" hidden>
 
-        <div class="stat-grid">
-          <div class="panel stat-card">
-            <p class="section-label">Sessions</p>
-            <p class="stat-value" id="stat-sessions">—</p>
-          </div>
-          <div class="panel stat-card">
-            <p class="section-label">Unique Visitors</p>
-            <p class="stat-value" id="stat-users">—</p>
-          </div>
-          <div class="panel stat-card">
-            <p class="section-label">Page Views</p>
-            <p class="stat-value" id="stat-pageviews">—</p>
-          </div>
+        <div class="panel stat-card" style="margin-bottom: 16px;">
+          <p class="section-label">Unique Visitors</p>
+          <p class="stat-value" id="stat-users">—</p>
         </div>
 
         <div class="panel analytics-section">
-          <p class="section-label">Sessions over time</p>
+          <p class="section-label">Visitors over time</p>
           <div class="sparkline-wrap" id="sparkline-wrap"></div>
         </div>
 
@@ -247,8 +238,8 @@
       credential_cspo:          "CSPO Certificate",
       project_escape_cube:      "Escape the Cube",
       project_escape_cube_live: "Escape the Cube \u2192 Live",
-      project_dnd_simulator:    "D&D Simulator",
-      project_dnd_simulator_live: "D&D Simulator \u2192 Live",
+      project_dnd_simulator:    "AI Driven RPG",
+      project_dnd_simulator_live: "AI Driven RPG \u2192 Live",
       project_common_core:      "Common Core",
       project_common_core_live: "Common Core \u2192 Live",
       resume_back_home:         "Resume \u2192 Back Home",
@@ -287,13 +278,22 @@
         </svg>`;
     }
 
+    function formatDateRange(days) {
+      const end = new Date();
+      const start = new Date();
+      start.setDate(start.getDate() - days);
+      const fmt = d => d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      return `${fmt(start)} \u2013 ${fmt(end)}, ${end.getFullYear()}`;
+    }
+
     function buildClicksTable(clicks) {
-      if (!clicks.length) {
+      const filtered = clicks.filter(({ label }) => label && label !== "(not set)");
+      if (!filtered.length) {
         return '<p class="analytics-empty">No click data yet. Make sure "label" is registered as a custom event dimension in GA4 (Admin \u2192 Custom Definitions).</p>';
       }
 
-      const maxCount = clicks[0].count;
-      const rows = clicks.map(({ label, count }) => {
+      const maxCount = filtered[0].count;
+      const rows = filtered.map(({ label, count }) => {
         const name = LABEL_NAMES[label] || label;
         const pct = Math.round((count / maxCount) * 100);
         return `
@@ -328,9 +328,8 @@
           throw new Error(data.error || "Failed to load analytics.");
         }
 
-        document.getElementById("stat-sessions").textContent = parseInt(data.summary.sessions).toLocaleString();
         document.getElementById("stat-users").textContent = parseInt(data.summary.users).toLocaleString();
-        document.getElementById("stat-pageviews").textContent = parseInt(data.summary.pageViews).toLocaleString();
+        document.getElementById("date-range").textContent = formatDateRange(days);
 
         document.getElementById("sparkline-wrap").innerHTML = buildSparkline(data.trend);
         document.getElementById("clicks-container").innerHTML = buildClicksTable(data.clicks);
