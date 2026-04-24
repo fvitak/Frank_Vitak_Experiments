@@ -314,6 +314,7 @@ h3 {
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);
   gap: 18px;
+  align-items: stretch;
   padding: 14px;
   border: 1px solid var(--line);
   border-radius: 26px;
@@ -322,12 +323,17 @@ h3 {
 }
 
 .project-media {
+  position: relative;
   display: block;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 18px;
 }
 
 .project-image {
   display: block;
   width: 100%;
+  height: 100%;
   min-height: 150px;
   max-height: 170px;
   object-fit: cover;
@@ -338,10 +344,11 @@ h3 {
 }
 
 .project-content {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 10px;
-  align-content: start;
-  padding-top: 2px;
+  align-items: flex-start;
+  height: 100%;
 }
 
 .compact-project-content {
@@ -355,14 +362,35 @@ h3 {
 }
 
 .compact-project-content .project-actions {
-  margin-top: 2px;
+  margin-top: auto;
 }
 
-.project-kicker {
-  margin-bottom: 0;
+.project-media-title {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 14px;
+  z-index: 1;
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fffdf7;
+  text-shadow: 0 1px 8px rgba(29, 28, 26, 0.55);
+}
+
+.project-media::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(29, 28, 26, 0) 0%, rgba(29, 28, 26, 0.68) 100%);
+  pointer-events: none;
 }
 
 .project-summary {
+  margin: 0;
   font-family: "Source Serif 4", serif;
   font-size: 1.02rem;
   line-height: 1.5;
@@ -376,7 +404,7 @@ h3 {
 .project-actions {
   display: flex;
   gap: 16px;
-  margin-top: 4px;
+  margin-top: auto;
 }
 
 .text-link {
