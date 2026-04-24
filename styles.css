@@ -322,17 +322,20 @@ h3 {
   box-shadow: var(--shadow);
 }
 
-.project-media {
+.project-visual {
   display: flex;
   flex-direction: column;
   gap: 10px;
   height: 100%;
 }
 
+.project-media {
+  display: block;
+}
+
 .project-image {
   display: block;
   width: 100%;
-  flex: 1 1 auto;
   min-height: 150px;
   max-height: 170px;
   object-fit: cover;
