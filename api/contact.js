@@ -1,3 +1,5 @@
+export const config = { runtime: "edge" };
+
 import { Resend } from "resend";
 
 function json(data, status = 200) {
