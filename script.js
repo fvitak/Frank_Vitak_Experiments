@@ -110,8 +110,7 @@ function applySiteConfig(config) {
 function trackClick(label, href) {
   if (analyticsEnabled && typeof window.gtag === "function") {
     window.gtag("event", "portfolio_click", {
-      event_category: "engagement",
-      event_label: label,
+      label,
       link_url: href || "not_provided"
     });
     return;
@@ -156,6 +155,7 @@ function initializeContactModal() {
     status.dataset.state = "";
     modal.hidden = false;
     document.body.style.overflow = "hidden";
+    trackClick("contact_modal_open");
   };
 
   const closeModal = () => {
@@ -200,6 +200,7 @@ function initializeContactModal() {
       }
 
       setState("success");
+      trackClick("contact_form_submit");
     } catch (error) {
       setState("form");
       status.textContent = error.message || "Unable to send message.";

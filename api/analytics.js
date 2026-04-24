@@ -46,10 +46,8 @@ export default async function handler(request) {
   }
 
   const propertyId = process.env.GA4_PROPERTY_ID;
-  const missing = ["GA4_PROPERTY_ID", "GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "GOOGLE_REFRESH_TOKEN"]
-    .filter(k => !process.env[k]);
-  if (missing.length) {
-    return json({ error: `Missing env vars: ${missing.join(", ")}` }, 500);
+  if (!propertyId || !process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET || !process.env.GOOGLE_REFRESH_TOKEN) {
+    return json({ error: "Analytics not configured." }, 500);
   }
 
   const url = new URL(request.url);
