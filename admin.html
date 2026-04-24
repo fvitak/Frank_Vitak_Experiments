@@ -248,6 +248,14 @@
       resume_download_secondary:"Resume \u2192 Download (alt)"
     };
 
+    function parseGA4Date(d) {
+      return new Date(+d.slice(0,4), +d.slice(4,6) - 1, +d.slice(6,8));
+    }
+
+    function fmtShort(d) {
+      return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    }
+
     function buildSparkline(trendRows) {
       if (!trendRows.length) {
         return '<p class="analytics-empty">No trend data available.</p>';
@@ -265,6 +273,11 @@
       const polyline = pts.join(" ");
       const fill = `0,${H} ${pts[0].split(",")[0]},${H} ${polyline} ${pts[pts.length - 1].split(",")[0]},${H}`;
 
+      const startLabel = fmtShort(parseGA4Date(trendRows[0].date));
+      const endLabel   = fmtShort(parseGA4Date(trendRows[trendRows.length - 1].date));
+      const midIndex   = Math.floor((trendRows.length - 1) / 2);
+      const midLabel   = trendRows.length > 3 ? fmtShort(parseGA4Date(trendRows[midIndex].date)) : "";
+
       return `
         <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
           <defs>
@@ -275,7 +288,12 @@
           </defs>
           <polygon points="${fill}" fill="url(#sg)"/>
           <polyline points="${polyline}" fill="none" stroke="#b44c2f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>`;
+        </svg>
+        <div style="display:flex; justify-content:space-between; margin-top:6px; font-size:0.75rem; color:var(--muted);">
+          <span>${startLabel}</span>
+          ${midLabel ? `<span>${midLabel}</span>` : ""}
+          <span>${endLabel}</span>
+        </div>`;
     }
 
     function formatDateRange(days) {
