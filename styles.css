@@ -333,6 +333,24 @@ h3 {
   display: block;
 }
 
+.compact-project-media {
+  position: relative;
+}
+
+.image-kicker {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  margin: 0;
+  padding: 4px 10px;
+  background: rgba(255, 252, 247, 0.88);
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  backdrop-filter: blur(8px);
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
 .project-image {
   display: block;
   width: 100%;
