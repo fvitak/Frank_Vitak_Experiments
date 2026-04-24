@@ -307,7 +307,7 @@
     function buildClicksTable(clicks) {
       const filtered = clicks.filter(({ label }) => label && label !== "(not set)");
       if (!filtered.length) {
-        return '<p class="analytics-empty">No click data yet. Make sure "label" is registered as a custom event dimension in GA4 (Admin \u2192 Custom Definitions).</p>';
+        return '<p class="analytics-empty">Click data can take up to 24 hours to appear after new events are recorded.</p>';
       }
 
       const maxCount = filtered[0].count;
