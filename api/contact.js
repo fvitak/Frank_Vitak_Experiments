@@ -2,6 +2,13 @@ import { Resend } from "resend";
 
 const DEFAULT_SEGMENT_ID = "7f67cf1b-9598-4baf-9aa4-0a120ba1941d";
 
+function withTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error(`Timed out after ${ms}ms`)), ms))
+  ]);
+}
+
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -54,32 +61,38 @@ export default async function handler(request) {
 
   if (resendSegmentId) {
     try {
-      await resend.contacts.create({
-        audienceId: resendSegmentId,
-        email,
-        firstName: name,
-        unsubscribed: false
-      });
+      await withTimeout(
+        resend.contacts.create({
+          audienceId: resendSegmentId,
+          email,
+          firstName: name,
+          unsubscribed: false
+        }),
+        4000
+      );
     } catch (error) {
       console.error("Resend contacts.create error:", error);
     }
   }
 
   try {
-    await resend.emails.send({
-      from: resendFromEmail,
-      to: [contactToEmail],
-      subject: `Portfolio contact from ${name}`,
-      replyTo: email,
-      text: `New portfolio contact\n\nName: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
-      html: `
-        <h2>New portfolio contact</h2>
-        <p><strong>Name:</strong> ${escapeHtml(name)}</p>
-        <p><strong>Email:</strong> ${escapeHtml(email)}</p>
-        <p><strong>Message:</strong></p>
-        <p>${escapeHtml(message).replace(/\n/g, "<br>")}</p>
-      `
-    });
+    await withTimeout(
+      resend.emails.send({
+        from: resendFromEmail,
+        to: [contactToEmail],
+        subject: `Portfolio contact from ${name}`,
+        replyTo: email,
+        text: `New portfolio contact\n\nName: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
+        html: `
+          <h2>New portfolio contact</h2>
+          <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+          <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+          <p><strong>Message:</strong></p>
+          <p>${escapeHtml(message).replace(/\n/g, "<br>")}</p>
+        `
+      }),
+      7000
+    );
 
     return json({ ok: true });
   } catch (error) {
