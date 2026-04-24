@@ -50,18 +50,22 @@ export default async function handler(request) {
     return json({ error: "Name, email, and message are required." }, 400);
   }
 
-  try {
-    const resend = new Resend(resendApiKey);
+  const resend = new Resend(resendApiKey);
 
-    if (resendSegmentId) {
+  if (resendSegmentId) {
+    try {
       await resend.contacts.create({
+        audienceId: resendSegmentId,
         email,
         firstName: name,
-        unsubscribed: false,
-        segments: [{ id: resendSegmentId }]
+        unsubscribed: false
       });
+    } catch (error) {
+      console.error("Resend contacts.create error:", error);
     }
+  }
 
+  try {
     await resend.emails.send({
       from: resendFromEmail,
       to: [contactToEmail],
@@ -79,7 +83,7 @@ export default async function handler(request) {
 
     return json({ ok: true });
   } catch (error) {
-    console.error("Resend contact error:", error);
+    console.error("Resend emails.send error:", error);
     return json({ error: "Unable to send message." }, 500);
   }
 }
