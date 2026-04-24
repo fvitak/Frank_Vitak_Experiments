@@ -1,7 +1,3 @@
-import { head, put } from "@vercel/blob";
-
-const CONFIG_PATH = "site-config/config.json";
-
 const DEFAULT_SITE_CONFIG = {
   summary_copy:
     "Certified Scrum Product Owner (CSPO) and Certified ScrumMaster (CSM) with four years of hands-on experience owning backlogs, writing user stories and acceptance criteria, and keeping cross-functional teams aligned in JIRA. I've worked across consumer-facing marketplaces and enterprise SaaS platforms, and I'm most effective at the translation layer: turning complex business requirements and stakeholder needs into clear, buildable specs. Data-driven by habit, documentation-disciplined by practice. The projects below are what I build when I'm not at work.",
@@ -20,20 +16,6 @@ const DEFAULT_SITE_CONFIG = {
   common_core_image: "./images/common-core-old-brains.png"
 };
 
-async function readStoredConfig() {
-  try {
-    const metadata = await head(CONFIG_PATH);
-    const response = await fetch(metadata.url, { cache: "no-store" });
-    if (!response.ok) {
-      return {};
-    }
-
-    return await response.json();
-  } catch (error) {
-    return {};
-  }
-}
-
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -44,58 +26,10 @@ function json(data, status = 200) {
   });
 }
 
-export default async function handler(request) {
-  if (request.method === "GET") {
-    const storedConfig = await readStoredConfig();
-    return json({
-      config: {
-        ...DEFAULT_SITE_CONFIG,
-        ...storedConfig
-      }
-    });
-  }
-
-  if (request.method !== "POST") {
+export default function handler(request) {
+  if (request.method !== "GET") {
     return json({ error: "Method not allowed." }, 405);
   }
 
-  let body;
-  try {
-    body = await request.json();
-  } catch (error) {
-    return json({ error: "Invalid JSON body." }, 400);
-  }
-
-  const adminPassword = process.env.ADMIN_PASSWORD;
-  if (!adminPassword) {
-    return json({ error: "ADMIN_PASSWORD is not configured." }, 500);
-  }
-
-  if (body.password !== adminPassword) {
-    return json({ error: "Incorrect password." }, 401);
-  }
-
-  const nextConfig = {};
-  for (const [key, value] of Object.entries(DEFAULT_SITE_CONFIG)) {
-    nextConfig[key] = typeof body.config?.[key] === "string" && body.config[key].trim()
-      ? body.config[key].trim()
-      : value;
-  }
-
-  try {
-    await put(CONFIG_PATH, JSON.stringify(nextConfig, null, 2), {
-      access: "public",
-      allowOverwrite: true,
-      contentType: "application/json"
-    });
-
-    return json({ ok: true, config: nextConfig });
-  } catch (error) {
-    return json(
-      {
-        error: error?.message || "Unable to save config."
-      },
-      500
-    );
-  }
+  return json({ config: DEFAULT_SITE_CONFIG });
 }
