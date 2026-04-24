@@ -137,14 +137,23 @@ function bindTrackedLinks() {
 
 function initializeContactModal() {
   const modal = document.querySelector("#contact-modal");
+  const dialog = modal?.querySelector(".contact-modal-dialog");
   const form = document.querySelector("#contact-form");
   const status = document.querySelector("#contact-status");
 
-  if (!modal || !form || !status) {
+  if (!modal || !dialog || !form || !status) {
     return;
   }
 
+  const setState = (state) => {
+    dialog.dataset.contactState = state;
+  };
+
   const openModal = () => {
+    setState("form");
+    form.reset();
+    status.textContent = "";
+    status.dataset.state = "";
     modal.hidden = false;
     document.body.style.overflow = "hidden";
   };
@@ -170,8 +179,7 @@ function initializeContactModal() {
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
-    status.textContent = "Sending message...";
-    status.dataset.state = "";
+    setState("sending");
 
     const payload = {
       name: form.elements.namedItem("name").value.trim(),
@@ -182,9 +190,7 @@ function initializeContactModal() {
     try {
       const response = await fetch("/api/contact", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
 
@@ -193,10 +199,9 @@ function initializeContactModal() {
         throw new Error(result.error || "Unable to send message.");
       }
 
-      form.reset();
-      status.textContent = "Message sent.";
-      status.dataset.state = "success";
+      setState("success");
     } catch (error) {
+      setState("form");
       status.textContent = error.message || "Unable to send message.";
       status.dataset.state = "error";
     }

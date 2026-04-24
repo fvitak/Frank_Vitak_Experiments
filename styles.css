@@ -409,6 +409,88 @@ h3 {
   min-height: 40px;
 }
 
+/* view switching */
+.contact-modal-view {
+  display: none;
+}
+
+.contact-modal-dialog[data-contact-state="form"] [data-view="form"],
+.contact-modal-dialog[data-contact-state="sending"] [data-view="sending"],
+.contact-modal-dialog[data-contact-state="success"] [data-view="success"] {
+  display: block;
+}
+
+/* sending + success shared layout */
+.contact-modal-feedback {
+  display: none;
+  text-align: center;
+  padding: 16px 0 8px;
+}
+
+.contact-modal-dialog[data-contact-state="sending"] .contact-modal-feedback[data-view="sending"],
+.contact-modal-dialog[data-contact-state="success"] .contact-modal-feedback[data-view="success"] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.contact-modal-feedback h2 {
+  margin: 0;
+}
+
+.contact-modal-feedback .section-label {
+  margin: 0;
+}
+
+/* spinner */
+.contact-sending-graphic {
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 8px;
+}
+
+.contact-spinner {
+  display: block;
+  width: 52px;
+  height: 52px;
+  border: 3px solid var(--line);
+  border-top-color: var(--brand);
+  border-radius: 50%;
+  animation: contact-spin 0.8s linear infinite;
+}
+
+@keyframes contact-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* success checkmark */
+.contact-success-graphic {
+  width: 72px;
+  height: 72px;
+  color: var(--brand);
+  margin-bottom: 8px;
+  animation: contact-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+.contact-success-graphic svg {
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes contact-pop {
+  from { transform: scale(0.6); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+.contact-success-body {
+  color: var(--muted);
+  margin: 8px 0 24px;
+  max-width: 380px;
+}
+
 .admin-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

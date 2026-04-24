@@ -218,35 +218,57 @@
 
   <div class="contact-modal" id="contact-modal" hidden>
     <div class="contact-modal-backdrop" data-contact-close="true" onclick="window.__closeContactModal && window.__closeContactModal()"></div>
-    <div class="contact-modal-dialog panel">
-      <div class="contact-modal-header">
-        <div>
-          <p class="section-label">Contact Frank</p>
-          <h2>Send a direct message</h2>
+    <div class="contact-modal-dialog panel" data-contact-state="form">
+
+      <div class="contact-modal-view" data-view="form">
+        <div class="contact-modal-header">
+          <div>
+            <p class="section-label">Contact Frank</p>
+            <h2>Send a direct message</h2>
+          </div>
+          <button type="button" class="ghost-link contact-close" data-contact-close="true" onclick="window.__closeContactModal && window.__closeContactModal()">Close</button>
         </div>
-        <button type="button" class="ghost-link contact-close" data-contact-close="true" onclick="window.__closeContactModal && window.__closeContactModal()">Close</button>
+        <form id="contact-form" class="contact-form">
+          <label class="admin-field">
+            <span>Name</span>
+            <input type="text" name="name" required>
+          </label>
+          <label class="admin-field">
+            <span>Email Address</span>
+            <input type="email" name="email" required>
+          </label>
+          <label class="admin-field">
+            <span>Message</span>
+            <textarea name="message" rows="7" required></textarea>
+          </label>
+          <div class="admin-actions">
+            <button type="submit" class="button">Send Message</button>
+          </div>
+          <p id="contact-status" class="admin-status"></p>
+        </form>
       </div>
 
-      <form id="contact-form" class="contact-form">
-        <label class="admin-field">
-          <span>Name</span>
-          <input type="text" name="name" required>
-        </label>
-        <label class="admin-field">
-          <span>Email Address</span>
-          <input type="email" name="email" required>
-        </label>
-        <label class="admin-field">
-          <span>Message</span>
-          <textarea name="message" rows="7" required></textarea>
-        </label>
-
-        <div class="admin-actions">
-          <button type="submit" class="button">Send Message</button>
+      <div class="contact-modal-view contact-modal-feedback" data-view="sending">
+        <div class="contact-sending-graphic">
+          <span class="contact-spinner"></span>
         </div>
+        <p class="section-label">One moment</p>
+        <h2>Sending your message&hellip;</h2>
+      </div>
 
-        <p id="contact-status" class="admin-status"></p>
-      </form>
+      <div class="contact-modal-view contact-modal-feedback" data-view="success">
+        <div class="contact-success-graphic">
+          <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+            <circle cx="24" cy="24" r="22" stroke="currentColor" stroke-width="2.5"/>
+            <polyline points="14,25 21,32 34,17" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <p class="section-label">Message received</p>
+        <h2>Thanks for reaching out</h2>
+        <p class="contact-success-body">I&rsquo;ll get back to you as soon as I can. In the meantime, feel free to connect on LinkedIn.</p>
+        <button type="button" class="button" data-contact-close="true" onclick="window.__closeContactModal && window.__closeContactModal()">Close</button>
+      </div>
+
     </div>
   </div>
 
