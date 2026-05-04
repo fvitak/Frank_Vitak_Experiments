@@ -27,8 +27,9 @@ Employer-facing static portfolio for:
 3. In Vercel, add `RESEND_API_KEY`.
 4. In Vercel, add `RESEND_FROM_EMAIL` using a verified sender/domain in Resend.
 5. Optionally add `CONTACT_TO_EMAIL` if you want messages sent somewhere other than `fvitak@gmail.com`.
-6. Push the repo to `https://github.com/fvitak/Frank_Vitak_Experiments`.
-7. Connect the repo to Vercel.
+6. In Vercel, add analytics env vars: `GA4_PROPERTY_ID`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `GOOGLE_REFRESH_TOKEN`.
+7. Push the repo to `https://github.com/fvitak/Frank_Vitak_Experiments`.
+8. Connect the repo to Vercel.
 
 ## Tracking behavior
 

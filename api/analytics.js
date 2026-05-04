@@ -7,19 +7,45 @@ function json(data, status = 200) {
   });
 }
 
+function getRequiredEnv() {
+  return {
+    propertyId: process.env.GA4_PROPERTY_ID,
+    clientId: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    refreshToken: process.env.GOOGLE_REFRESH_TOKEN
+  };
+}
+
+function getMissingEnv(env) {
+  return Object.entries({
+    GA4_PROPERTY_ID: env.propertyId,
+    GOOGLE_CLIENT_ID: env.clientId,
+    GOOGLE_CLIENT_SECRET: env.clientSecret,
+    GOOGLE_REFRESH_TOKEN: env.refreshToken
+  })
+    .filter(([, value]) => !value)
+    .map(([key]) => key);
+}
+
 async function getAccessToken() {
+  const env = getRequiredEnv();
   const res = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
-      client_id: process.env.GOOGLE_CLIENT_ID,
-      client_secret: process.env.GOOGLE_CLIENT_SECRET,
-      refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
+      client_id: env.clientId,
+      client_secret: env.clientSecret,
+      refresh_token: env.refreshToken,
       grant_type: "refresh_token"
     })
   });
-  const data = await res.json();
-  if (!data.access_token) throw new Error("Failed to get access token from Google.");
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok || !data.access_token) {
+    const oauthMessage = data.error_description || data.error || `HTTP ${res.status}`;
+    throw new Error(`Google OAuth token request failed: ${oauthMessage}`);
+  }
+
   return data.access_token;
 }
 
@@ -45,9 +71,10 @@ export default async function handler(request) {
     return json({ error: "Method not allowed." }, 405);
   }
 
-  const propertyId = process.env.GA4_PROPERTY_ID;
-  if (!propertyId || !process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET || !process.env.GOOGLE_REFRESH_TOKEN) {
-    return json({ error: "Analytics not configured." }, 500);
+  const env = getRequiredEnv();
+  const missingEnv = getMissingEnv(env);
+  if (missingEnv.length) {
+    return json({ error: `Analytics not configured. Missing: ${missingEnv.join(", ")}` }, 500);
   }
 
   const url = new URL(request.url);
@@ -59,7 +86,7 @@ export default async function handler(request) {
     const accessToken = await getAccessToken();
 
     const [overview, clicks, trend] = await Promise.all([
-      runReport(accessToken, propertyId, {
+      runReport(accessToken, env.propertyId, {
         dateRanges: [dateRange],
         metrics: [
           { name: "sessions" },
@@ -67,7 +94,7 @@ export default async function handler(request) {
           { name: "screenPageViews" }
         ]
       }),
-      runReport(accessToken, propertyId, {
+      runReport(accessToken, env.propertyId, {
         dateRanges: [dateRange],
         dimensions: [{ name: "customEvent:label" }],
         metrics: [{ name: "eventCount" }],
@@ -79,7 +106,7 @@ export default async function handler(request) {
         },
         orderBys: [{ metric: { metricName: "eventCount" }, desc: true }]
       }).catch(() => ({ rows: [] })),
-      runReport(accessToken, propertyId, {
+      runReport(accessToken, env.propertyId, {
         dateRanges: [dateRange],
         dimensions: [{ name: "date" }],
         metrics: [{ name: "sessions" }],
